@@ -7,13 +7,14 @@ enum DatabaseProviderType {
 
 namespace DatabaseService {
     export type FilterConfig<T = Record<string, any>> = {
-        byFields?: T;
+        byFields?: Partial<T>;
+        byJSON?: { [key: string]: any };
     }
     export type QueryConfig = {
         limit?: number;
         offset?: number;
     }
-    export type Query<FilterType = undefined> = FilterConfig<FilterType> & QueryConfig;
+    export type Query<FilterType> = FilterConfig<FilterType> & QueryConfig;
 
     export type QueryStatus = "success" | "error";
     export type QueryResponse<T, Status extends QueryStatus | undefined = undefined> =
@@ -48,22 +49,26 @@ namespace DatabaseService {
         error: Error;
     }
     export interface Table<T> {
-        find(query: Query): Promise<QueryResponse<AliveData<T[]>>>;
-        findOne(query: Query): Promise<QueryResponse<AliveData<T>>>;
-        has(query: Query): Promise<QueryResponse<boolean>>;
+        find(query: Query<T>): Promise<QueryResponse<AliveData<T[]>>>;
+        findOne(query: Query<T>): Promise<QueryResponse<AliveData<T>>>;
+        has(query: Query<T>): Promise<QueryResponse<boolean>>;
         insert(data: T): Promise<QueryResponse<AliveData<T>>>;
-        set(query: Query, data: T): Promise<QueryResponse<AliveData<T>>>;
-        update(query: Query, handler: (data: T) => T | Promise<T>): Promise<QueryResponse<AliveData<T>>>;
-        delete(query: Query): Promise<QueryResponse<null>>;
+        set(query: Query<T>, data: T): Promise<QueryResponse<AliveData<T>>>;
+        update(query: Query<T>, handler: (data: T) => T | Promise<T>): Promise<QueryResponse<AliveData<T>>>;
+        delete(query: Query<T>): Promise<QueryResponse<null>>;
     }
 
     export type TableStructure = {
         [key: string]: {
-            type: DataTypes.AbstractDataTypeConstructor | DataTypes.ArrayDataType<any>;
+            type: DataTypes.DataType;
             primaryKey?: boolean;
             unique?: boolean;
             required?: boolean;
-            default?: any;
+            defaultValue?: any;
+            autoIncrement?: boolean;
+            validate?: {
+                validator: (value: unknown) => boolean;
+            }
         }
     }
     export interface Provider {

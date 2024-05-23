@@ -26,3 +26,13 @@ export function assignConfig<T extends Record<string, any>>(a: DeepPartial<T>, b
     return o as T;
 }
 
+export function filter(allowed: string[], obj: Record<string, any>): Record<string, any> {
+    let filtered: Record<string, any> = {};
+    for (let key in obj) {
+        if (allowed.includes(key)) {
+            filtered[key] = obj[key];
+        }
+    }
+    return filtered;
+}
+

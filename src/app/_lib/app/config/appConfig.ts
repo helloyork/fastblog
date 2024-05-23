@@ -40,7 +40,6 @@ const DefaultConfig: FastBlogConfig<{
         auth: {
             type: AuthProvierType.Credential,
             config: {
-                jwtSecret: "secret",
                 secret: "secret",
                 expire: 7 * 24 * 60 * 60 * 1000,
             }

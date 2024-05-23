@@ -14,18 +14,18 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
         this.provider = provider;
         this.model = this.createModel(this.toStructure(model));
     }
-    find(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T[]>>> {
+    find(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T[]>>> {
         return this.rejectIfError(async () => {
             return (await this.model.findAll(this.toFindOptions(query)))
                 .map(m => m.get());
         });
     }
-    findOne(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
+    findOne(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         return this.rejectIfError(async () => {
             return await this.model.findOne(this.toFindOptions(query));
         });
     }
-    has(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<boolean>> {
+    has(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<boolean>> {
         return this.rejectIfError(async () => {
             return !!(await this.model.findOne(this.toFindOptions(query)));
         });
@@ -36,7 +36,7 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
             return res
         });
     }
-    set(query: DatabaseService.Query, data: T): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
+    set(query: DatabaseService.Query<T>, data: T): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         return this.rejectIfError(async () => {
             let models = await this.model.findAll(this.toFindOptions(query));
             return await Promise.all(models.map(async (model) => {
@@ -45,7 +45,7 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
             }));
         });
     }
-    update(query: DatabaseService.Query, handler: (data: T) => T | Promise<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
+    update(query: DatabaseService.Query<T>, handler: (data: T) => T | Promise<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         return this.rejectIfError(async () => {
             let models = await this.model.findAll(this.toFindOptions(query));
             return await Promise.all(models.map(async (model) => {
@@ -55,7 +55,7 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
             }));
         });
     }
-    delete(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<null>> {
+    delete(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<null>> {
         return this.rejectIfError(async () => {
             let models = await this.model.findAll(this.toFindOptions(query));
             return await Promise.all(models.map(async (model) => {
@@ -92,6 +92,7 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
         return {
             where: {
                 ...(query.byFields || {}),
+                ...(query.byJSON || {}),
             },
             limit: query.limit,
             offset: query.offset,
@@ -108,7 +109,15 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
                 unique: value.unique,
                 primaryKey: value.primaryKey,
                 allowNull: !value.required,
-                defaultValue: value.default,
+                defaultValue: value.defaultValue,
+                autoIncrement: value.autoIncrement,
+                validate: {
+                    isValid(_value: unknown): boolean {
+                        if (typeof value.validate !== "object" || value.validate === null || typeof (value.validate.validator) !== "function") return true;
+                        if (value.validate.validator(_value) === false) throw new Error("Validation failed")
+                        return true;
+                    }
+                }
             };
         }
         return outputForPostgres;
@@ -124,6 +133,7 @@ export class PostgresDatabaseProvider extends BaseDatabaseProvider {
     providerName: DatabaseProviderType = DatabaseProviderType.Postgres;
     sequelize: Sequelize | null = null;
     config: DatabaseService.DatabaseConfig[DatabaseProviderType.Postgres];
+    tables: Record<string, PostgresTable<any>> = {};
     constructor(config: DatabaseService.DatabaseConfig[DatabaseProviderType.Postgres]) {
         super(config);
         this.config = config;
@@ -154,10 +164,12 @@ export class PostgresDatabaseProvider extends BaseDatabaseProvider {
     }
     async getTable<T extends {}>(name: string, model: SequelizeModelStructure): Promise<DatabaseService.Table<T>> {
         if (!this.sequelize) await this.connect();
+        if (this.tables[name]) return this.tables[name];
         let m = new PostgresTable<T>(this, name, model);
         await this.sequelize!.sync({
             alter: true,
         });
+        this.tables[name] = m;
         return m;
     }
     hello(): Promise<DatabaseService.ServiceResponse<void>> {
