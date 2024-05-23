@@ -1,5 +1,5 @@
-import { DatabaseProviderType, EnvProviderType } from "@/app/_lib/services/services";
-import { readFromEnv } from "@/app/_lib/utils/data";
+import { AuthProvierType, DatabaseProviderType, EnvProviderType } from "@lib/services/services";
+import { readFromEnv } from "@lib/utils/data";
 import type { UserFastBlogConfig } from "@lib/app/config/types";
 
 readFromEnv();
@@ -7,6 +7,7 @@ readFromEnv();
 const config: UserFastBlogConfig<{
     database: DatabaseProviderType.Postgres;
     env: EnvProviderType.Local;
+    auth: AuthProvierType.Credential;
 }> = {
     services: {
         database: {

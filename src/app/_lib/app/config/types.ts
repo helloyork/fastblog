@@ -4,10 +4,12 @@ import { DeepPartial } from "@lib/utils/data";
 
 import { DatabaseService, DatabaseProviderType } from "@lib/services/database/types";
 import { EnvService, EnvProviderType } from "@lib/services/env/types";
+import { AuthProvierType, AuthService } from "@lib/services/services";
 
 type FastBlogConfigType = {
     database: DatabaseProviderType;
     env: EnvProviderType;
+    auth: AuthProvierType;
 }
 type FastBlogConfig<T extends FastBlogConfigType = FastBlogConfigType> = {
     app: {
@@ -23,12 +25,17 @@ type FastBlogConfig<T extends FastBlogConfigType = FastBlogConfigType> = {
             type: T["env"];
             config: EnvService.EnvConfig[T["env"]];
         },
+        auth: {
+            type: T["auth"];
+            config: AuthService.AuthServiceConfig[T["auth"]];
+        }
     };
 }
 type FastBlogRuntime = {
     services:{
         database: DatabaseService.Provider;
         env: EnvService.Provider;
+        auth: AuthService.AuthProvider<AuthProvierType>;
     }
 }
 
