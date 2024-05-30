@@ -1,3 +1,5 @@
+import "server-only";
+
 import { BaseDatabaseProvider } from "./base";
 import { PostgresDatabaseProvider } from "./providers/postgres";
 import { DatabaseService, DatabaseProviderType } from "./types";

@@ -1,5 +1,5 @@
 
-enum AuthProvierType {
+enum AuthProviderType {
     Base = "base",
     Credential = "credential",
 }
@@ -15,7 +15,7 @@ type FilteredUserData = {
         name: string;
     };
     auth: {
-        type: AuthProvierType;
+        type: AuthProviderType;
         data: AuthSecretData;
     }[];
 }
@@ -26,8 +26,8 @@ namespace AuthService {
         password: string;
     }
     export type AuthCred = {
-        [AuthProvierType.Credential]: AuthConfig_Credential;
-        [AuthProvierType.Base]: {};
+        [AuthProviderType.Credential]: AuthConfig_Credential;
+        [AuthProviderType.Base]: {};
     }
 
     export type AuthRegister_Credential = {
@@ -35,27 +35,27 @@ namespace AuthService {
         password: string;
     }
     export type AuthRegister = {
-        [AuthProvierType.Credential]: AuthRegister_Credential;
-        [AuthProvierType.Base]: {};
+        [AuthProviderType.Credential]: AuthRegister_Credential;
+        [AuthProviderType.Base]: {};
     }
 
     export type AuthRegisterResult = {
-        [AuthProvierType.Credential]: {
+        [AuthProviderType.Credential]: {
             user: Partial<FilteredUserData>;
         };
-        [AuthProvierType.Base]: {};
+        [AuthProviderType.Base]: {};
     }
 
     export type AuthResponseTypes = {
-        [AuthProvierType.Credential]: AuthResponse<string>;
-        [AuthProvierType.Base]: AuthResponse<string>;
+        [AuthProviderType.Credential]: AuthResponse<string>;
+        [AuthProviderType.Base]: AuthResponse<string>;
     }
     export type AuthServiceConfig = {
-        [AuthProvierType.Credential]: {
+        [AuthProviderType.Credential]: {
             secret: string;
             expire: number;
         };
-        [AuthProvierType.Base]: {
+        [AuthProviderType.Base]: {
             expire: number;
         };
     }
@@ -66,7 +66,7 @@ namespace AuthService {
         status: "error";
         error: Error;
     }
-    export interface AuthProvider<T extends AuthProvierType> {
+    export interface AuthProvider<T extends AuthProviderType> {
         login(config: AuthCred[T]): Promise<AuthResponseTypes[T]>;
         register(config: AuthCred[T]): Promise<AuthRegisterResult[T]>;
         auth(token: string): Promise<AuthResponse<null>>;
@@ -75,7 +75,7 @@ namespace AuthService {
 }
 
 export {
-    AuthProvierType
+    AuthProviderType
 }
 
 export type {

@@ -2,12 +2,12 @@ import "server-only";
 
 import { DataTypes } from "sequelize";
 import { ServerApiResponse, prepare } from "./api";
-import { AuthProvierType, DatabaseService } from "@lib/services/services";
+import { AuthProviderType, DatabaseService } from "@lib/services/services";
 
 type AuthTableTypes = {
     id?: string;
     ownerid: number;
-    type: AuthProvierType;
+    type: AuthProviderType;
     token: Record<string, any>;
     stamp: number;
 }

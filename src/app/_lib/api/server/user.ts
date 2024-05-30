@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { ServerApiResponse, prepare } from "./api";
 
 import zod from "zod";
-import { AuthProvierType, DatabaseService } from "@lib/services/services";
+import { AuthProviderType, DatabaseService } from "@lib/services/services";
 import { AuthSecretData } from "@lib/services/auth/types";
 
 type UserProfile = {
@@ -13,7 +13,7 @@ const UserProfileSchema = zod.object({
 });
 
 type UserAuth = {
-    type: AuthProvierType,
+    type: AuthProviderType,
     data: AuthSecretData
 }
 const UserAuthSchema = zod.object({

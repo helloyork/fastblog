@@ -1,3 +1,5 @@
+import "server-only";
+
 import { DeepPartial, assignConfig } from "@lib/utils/data";
 import { FastBlogConfig, FastBlogRuntime } from "./types";
 
@@ -8,12 +10,12 @@ import { EnvProviderType } from "@lib/services/env/types";
 import { launchService as EnvServiceLauncher } from "@lib/services/env/index";
 import { launchService as DatabaseServiceLauncher } from "@lib/services/database/index";
 import { launchService as AuthServiceLauncher } from "@lib/services/auth/index";
-import { AuthProvierType } from "@lib/services/services";
+import { AuthProviderType } from "@lib/services/services";
 
 const DefaultConfig: FastBlogConfig<{
     database: DatabaseProviderType.Postgres;
     env: EnvProviderType.Local;
-    auth: AuthProvierType.Credential;
+    auth: AuthProviderType.Credential;
 }> = {
     app: {
         metadata: {
@@ -38,7 +40,7 @@ const DefaultConfig: FastBlogConfig<{
             }
         },
         auth: {
-            type: AuthProvierType.Credential,
+            type: AuthProviderType.Credential,
             config: {
                 secret: "secret",
                 expire: 7 * 24 * 60 * 60 * 1000,

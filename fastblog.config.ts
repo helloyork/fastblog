@@ -1,13 +1,10 @@
-import { AuthProvierType, DatabaseProviderType, EnvProviderType } from "@lib/services/services";
+import { AuthProviderType, DatabaseProviderType, EnvProviderType } from "@lib/services/services";
 import { readFromEnv } from "@lib/utils/data";
 import type { UserFastBlogConfig } from "@lib/app/config/types";
 
-readFromEnv();
-
 const config: UserFastBlogConfig<{
     database: DatabaseProviderType.Postgres;
-    env: EnvProviderType.Local;
-    auth: AuthProvierType.Credential;
+    auth: AuthProviderType.Credential;
 }> = {
     services: {
         database: {

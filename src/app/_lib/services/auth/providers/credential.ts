@@ -2,7 +2,7 @@ import { getAuthApi } from "@lib/api/server/auth";
 import { UserData, getUserApi } from "@lib/api/server/user";
 
 import { BaseAuthProvider } from "../base";
-import { AuthProvierType, AuthService } from "../types";
+import { AuthProviderType, AuthService } from "../types";
 import { compareHash, generateToken } from "@lib/crypt/crypt";
 import { AppConfig } from "@/app/_lib/app/config/appConfig";
 import { filter } from "@/app/_lib/utils/data";
@@ -12,7 +12,7 @@ import { filter } from "@/app/_lib/utils/data";
 const AllowedFields: (keyof UserData)[] = ["userId", "username", "profile", "auth"];
 
 export class CredentialAuthProvider extends BaseAuthProvider {
-    constructor(config: AuthService.AuthServiceConfig[AuthProvierType.Credential]) {
+    constructor(config: AuthService.AuthServiceConfig[AuthProviderType.Credential]) {
         super(config);
         this.config = config;
     }
@@ -24,14 +24,14 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             if (user.status === "error") throw user.error;
             if (!user.data) throw new Error("Username or password is incorrect");
 
-            let credMethod = user.data.auth.find((a) => a.type === AuthProvierType.Credential);
+            let credMethod = user.data.auth.find((a) => a.type === AuthProviderType.Credential);
             if (!credMethod) throw new Error("Username or password is incorrect");
 
             let compared = await compareHash(config.password, credMethod.data.password || "");
             if (!compared) throw new Error("Username or password is incorrect");
 
             let token = await generateToken();
-            let saved = await authApi.addToken(user.data.userId!, AuthProvierType.Credential, {
+            let saved = await authApi.addToken(user.data.userId!, AuthProviderType.Credential, {
                 ["credential"]: token,
             });
             if (saved.status === "error") throw saved.error;
@@ -86,7 +86,7 @@ export class CredentialAuthProvider extends BaseAuthProvider {
                     name: config.username,
                 },
                 auth: [{
-                    type: AuthProvierType.Credential,
+                    type: AuthProviderType.Credential,
                     data: {
                         password: config.password,
                     },

@@ -4,14 +4,16 @@ import { DeepPartial } from "@lib/utils/data";
 
 import { DatabaseService, DatabaseProviderType } from "@lib/services/database/types";
 import { EnvService, EnvProviderType } from "@lib/services/env/types";
-import { AuthProvierType, AuthService } from "@lib/services/services";
+import { AuthProviderType, AuthService } from "@lib/services/services";
 
 type FastBlogConfigType = {
     database: DatabaseProviderType;
     env: EnvProviderType;
-    auth: AuthProvierType;
+    auth: AuthProviderType;
 }
-type FastBlogConfig<T extends FastBlogConfigType = FastBlogConfigType> = {
+type FastBlogConfig<
+    T extends FastBlogConfigType = FastBlogConfigType,
+> = {
     app: {
         metadata: Metadata;
         styles: {};
@@ -32,14 +34,17 @@ type FastBlogConfig<T extends FastBlogConfigType = FastBlogConfigType> = {
     };
 }
 type FastBlogRuntime = {
-    services:{
+    services: {
         database: DatabaseService.Provider;
         env: EnvService.Provider;
-        auth: AuthService.AuthProvider<AuthProvierType>;
+        auth: AuthService.AuthProvider<AuthProviderType>;
     }
 }
 
-type UserFastBlogConfig<T extends FastBlogConfigType = FastBlogConfigType> = DeepPartial<FastBlogConfig<T>>;
+type UserFastBlogConfig<
+    T extends Partial<FastBlogConfigType> = FastBlogConfigType,
+    _T extends FastBlogConfigType = T & FastBlogConfigType,
+> = DeepPartial<FastBlogConfig<_T>>;
 
 export type {
     FastBlogConfig,

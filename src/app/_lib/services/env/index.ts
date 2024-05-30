@@ -1,3 +1,5 @@
+import "server-only";
+
 import { LocalEnvProvider } from "./providers/local";
 import { EnvProviderType } from "./types";
 import type { EnvService } from "./types";

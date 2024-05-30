@@ -1,18 +1,20 @@
+import "server-only";
+
 import { BaseAuthProvider } from "./base";
 import { CredentialAuthProvider } from "./providers/credential";
-import { AuthProvierType, AuthService } from "./types";
+import { AuthProviderType, AuthService } from "./types";
 
-let instance: null | AuthService.AuthProvider<AuthProvierType> = null;
+let instance: null | AuthService.AuthProvider<AuthProviderType> = null;
 export function launchService(
-    name: AuthProvierType,
-    config: AuthService.AuthServiceConfig[AuthProvierType]
-): AuthService.AuthProvider<AuthProvierType> {
+    name: AuthProviderType,
+    config: AuthService.AuthServiceConfig[AuthProviderType]
+): AuthService.AuthProvider<AuthProviderType> {
     if (instance) {
         return instance;
     }
-    const providers: Record<AuthProvierType, new (config: any) => AuthService.AuthProvider<AuthProvierType>> = {
-        [AuthProvierType.Base]: BaseAuthProvider,
-        [AuthProvierType.Credential]: CredentialAuthProvider,
+    const providers: Record<AuthProviderType, new (config: any) => AuthService.AuthProvider<AuthProviderType>> = {
+        [AuthProviderType.Base]: BaseAuthProvider,
+        [AuthProviderType.Credential]: CredentialAuthProvider,
     }
     instance = new providers[name](config);
     return new providers[name](config);
