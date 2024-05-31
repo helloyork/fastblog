@@ -30,6 +30,7 @@ type FastBlogConfig<
         auth: {
             type: T["auth"];
             config: AuthService.AuthServiceConfig[T["auth"]];
+            cookieStoreName: string;
         }
     };
 }
@@ -43,7 +44,7 @@ type FastBlogRuntime = {
 
 type UserFastBlogConfig<
     T extends Partial<FastBlogConfigType> = FastBlogConfigType,
-    _T extends FastBlogConfigType = T & FastBlogConfigType,
+    _T extends FastBlogConfigType = FastBlogConfigType & T,
 > = DeepPartial<FastBlogConfig<_T>>;
 
 export type {

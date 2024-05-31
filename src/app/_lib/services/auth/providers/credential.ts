@@ -2,12 +2,10 @@ import { getAuthApi } from "@lib/api/server/auth";
 import { UserData, getUserApi } from "@lib/api/server/user";
 
 import { BaseAuthProvider } from "../base";
-import { AuthProviderType, AuthService } from "../types";
+import { AuthProviderType, AuthService, FilteredUserData } from "../types";
 import { compareHash, generateToken } from "@lib/crypt/crypt";
-import { AppConfig } from "@/app/_lib/app/config/appConfig";
-import { filter } from "@/app/_lib/utils/data";
-
-// @TODO: Implement CredentialAuthProvider
+import { AppConfig } from "@lib/app/config/appConfig";
+import { filter } from "@lib/utils/data";
 
 const AllowedFields: (keyof UserData)[] = ["userId", "username", "profile", "auth"];
 
@@ -35,18 +33,12 @@ export class CredentialAuthProvider extends BaseAuthProvider {
                 ["credential"]: token,
             });
             if (saved.status === "error") throw saved.error;
-            return {
-                status: "success",
-                data: token,
-            }
+            return this.resolve(token);
         } catch (e) {
-            return {
-                status: "error",
-                error: e instanceof Error ? e : new Error(String(e)),
-            }
+            return this.reject(e instanceof Error ? e : new Error(String(e)));
         }
     }
-    async auth(token: string): Promise<AuthService.AuthResponse<null>> {
+    async auth(token: string): Promise<AuthService.AuthResponse<Partial<FilteredUserData>>> {
         let [authApi, userApi] = await Promise.all([getAuthApi(), getUserApi()]);
 
         try {
@@ -63,15 +55,9 @@ export class CredentialAuthProvider extends BaseAuthProvider {
                 throw new Error("Token expired");
             }
 
-            return {
-                status: "success",
-                data: null,
-            }
+            return this.resolve(filter(AllowedFields, user.data));
         } catch (e) {
-            return {
-                status: "error",
-                error: e instanceof Error ? e : new Error(String(e)),
-            }
+            return this.reject(e instanceof Error ? e : new Error(String(e)));
         }
     }
     async register(
@@ -100,17 +86,11 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             });
             if (token.status === "error") throw token.error;
 
-            return {
-                status: "success",
-                data: {
-                    user: filter(AllowedFields, user.data!),
-                }
-            }
+            return this.resolve({
+                user: filter(AllowedFields, user.data!),
+            });
         } catch (e) {
-            return {
-                status: "error",
-                error: e instanceof Error ? e : new Error(String(e)),
-            }
+            return this.reject(e instanceof Error ? e : new Error(String(e)));
         }
     }
     async expire(token: string): Promise<AuthService.AuthResponse<null>> {
@@ -121,15 +101,9 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             if (authResult.status === "error") throw authResult.error;
 
             await authApi.removeToken("token.credential", token);
-            return {
-                status: "success",
-                data: null,
-            }
+            return this.resolve(null);
         } catch (e) {
-            return {
-                status: "error",
-                error: e instanceof Error ? e : new Error(String(e)),
-            }
+            return this.reject(e instanceof Error ? e : new Error(String(e)));
         }
     }
 }

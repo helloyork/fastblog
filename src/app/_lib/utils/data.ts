@@ -36,3 +36,7 @@ export function filter(allowed: string[], obj: Record<string, any>): Record<stri
     return filtered;
 }
 
+export function filterString(string: string): string {
+    return string.replace(/[^a-zA-Z0-9_]/g, '');
+}
+

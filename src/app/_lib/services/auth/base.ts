@@ -1,5 +1,5 @@
 import { AuthProviderType } from "./types";
-import type { AuthService } from "./types";
+import type { AuthService, FilteredUserData } from "./types";
 
 
 export class BaseAuthProvider implements AuthService.AuthProvider<AuthProviderType.Base> {
@@ -10,7 +10,7 @@ export class BaseAuthProvider implements AuthService.AuthProvider<AuthProviderTy
     login(config: {}): Promise<AuthService.AuthResponse<string>> {
         throw new Error("Method not implemented.");
     }
-    auth(token: string): Promise<AuthService.AuthResponse<null>> {
+    auth(token: string): Promise<AuthService.AuthResponse<Partial<FilteredUserData>>> {
         throw new Error("Method not implemented.");
     }
     register(config: {}): Promise<{}> {
@@ -18,6 +18,18 @@ export class BaseAuthProvider implements AuthService.AuthProvider<AuthProviderTy
     }
     expire(token: string): Promise<AuthService.AuthResponse<null>> {
         throw new Error("Method not implemented.");
+    }
+    resolve<T>(data: T): AuthService.AuthResponse<T> {
+        return {
+            status: "success",
+            data: data,
+        }
+    }
+    reject<T>(error: Error): AuthService.AuthResponse<T> {
+        return {
+            status: "error",
+            error: error,
+        }
     }
 }
 

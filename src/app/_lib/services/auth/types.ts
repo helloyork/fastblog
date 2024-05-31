@@ -69,7 +69,7 @@ namespace AuthService {
     export interface AuthProvider<T extends AuthProviderType> {
         login(config: AuthCred[T]): Promise<AuthResponseTypes[T]>;
         register(config: AuthCred[T]): Promise<AuthRegisterResult[T]>;
-        auth(token: string): Promise<AuthResponse<null>>;
+        auth(token: string): Promise<AuthResponse<Partial<FilteredUserData>>>;
         expire(token: string): Promise<AuthResponse<null>>;
     }
 }
@@ -80,5 +80,6 @@ export {
 
 export type {
     AuthService,
-    AuthSecretData
+    AuthSecretData,
+    FilteredUserData
 }
