@@ -9,6 +9,7 @@ export enum ClientRequestMethod {
 export enum EndpointUrls {
     AUTH_LOGIN = "/api/auth/login",
     AUTH_AUTH = "/api/auth/auth",
+    AUTH_REGISTER = "/api/auth/register",
 }
 
 export namespace Endpoints {
@@ -26,14 +27,26 @@ export namespace Endpoints {
             request: {
                 type: AuthProviderType,
                 payload: Record<string, string>,
+                remember?: boolean,
             },
             response: ClientResponse<string>;
         };
         auth: {
             url: EndpointUrls.AUTH_AUTH;
             method: ClientRequestMethod.POST;
-            request: {},
+            request: any,
             response: ClientResponse<Partial<FilteredUserData>>;
+        };
+        register: {
+            url: EndpointUrls.AUTH_REGISTER;
+            method: ClientRequestMethod.POST;
+            request: {
+                type: AuthProviderType,
+                payload: Record<string, string>,
+            },
+            response: ClientResponse<{
+                user: Partial<FilteredUserData>,
+            }>;
         };
     };
     export type EndpointsType = Auth;
@@ -49,9 +62,9 @@ export async function requestEndpoint<T extends keyof Endpoints.EndpointsType>(
     }
     return fetch(endpoint.url, {
         method: endpoint.method,
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
-            "credentials": "include",
             ...(headers || {})
         },
         body: JSON.stringify(data),

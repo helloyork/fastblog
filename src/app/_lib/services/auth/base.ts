@@ -13,7 +13,7 @@ export class BaseAuthProvider implements AuthService.AuthProvider<AuthProviderTy
     auth(token: string): Promise<AuthService.AuthResponse<Partial<FilteredUserData>>> {
         throw new Error("Method not implemented.");
     }
-    register(config: {}): Promise<{}> {
+    register(config: {}): Promise<AuthService.AuthResponse<{ user: any; token: string; }>> {
         throw new Error("Method not implemented.");
     }
     expire(token: string): Promise<AuthService.AuthResponse<null>> {

@@ -6,8 +6,9 @@ import { AuthProviderType, AuthService, FilteredUserData } from "../types";
 import { compareHash, generateToken } from "@lib/crypt/crypt";
 import { AppConfig } from "@lib/app/config/appConfig";
 import { filter } from "@lib/utils/data";
+import { z } from "zod";
 
-const AllowedFields: (keyof UserData)[] = ["userId", "username", "profile", "auth"];
+const AllowedFields: (keyof UserData)[] = ["userId", "username", "profile"];
 
 export class CredentialAuthProvider extends BaseAuthProvider {
     constructor(config: AuthService.AuthServiceConfig[AuthProviderType.Credential]) {
@@ -15,6 +16,16 @@ export class CredentialAuthProvider extends BaseAuthProvider {
         this.config = config;
     }
     async login(config: AuthService.AuthConfig_Credential): Promise<AuthService.AuthResponse<string>> {
+        const LoginSchema = z.object({
+            username: z.string(),
+            password: z.string(),
+            remember: z.boolean(),
+        });
+
+        if (!LoginSchema.safeParse(config).success) {
+            return this.reject(new Error("Invalid payload"));
+        }
+
         let [authApi, userApi] = await Promise.all([getAuthApi(), getUserApi()]);
 
         try {
@@ -31,7 +42,7 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             let token = await generateToken();
             let saved = await authApi.addToken(user.data.userId!, AuthProviderType.Credential, {
                 ["credential"]: token,
-            });
+            }, config.remember ? AppConfig.get().services.auth.config.expire : 1 * 24 * 60 * 60 * 1000);
             if (saved.status === "error") throw saved.error;
             return this.resolve(token);
         } catch (e) {
@@ -50,7 +61,10 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             if (user.status === "error") throw user.error;
             if (!user.data) throw new Error("Invalid token");
 
-            if (auth.data.stamp + AppConfig.get().services.auth.config.expire > Date.now()) {
+            if (
+                (auth.data.expireAt && Date.now() > auth.data.expireAt) ||
+                (auth.data.stamp + AppConfig.get().services.auth.config.expire > Date.now())
+            ) {
                 await authApi.removeToken("token.credential", token);
                 throw new Error("Token expired");
             }
@@ -63,6 +77,14 @@ export class CredentialAuthProvider extends BaseAuthProvider {
     async register(
         config: AuthService.AuthRegister_Credential
     ): Promise<AuthService.AuthResponse<AuthService.AuthRegisterResult["credential"]>> {
+        const RegisterSchema = z.object({
+            username: z.string(),
+            password: z.string(),
+        });
+
+        if (!RegisterSchema.safeParse(config).success) {
+            return this.reject(new Error("Invalid payload"));
+        }
         let userApi = await getUserApi();
 
         try {
@@ -86,8 +108,9 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             });
             if (token.status === "error") throw token.error;
 
-            return this.resolve({
+            return this.resolve<{ user: Record<string, any>, token: string; }>({
                 user: filter(AllowedFields, user.data!),
+                token: token.data,
             });
         } catch (e) {
             return this.reject(e instanceof Error ? e : new Error(String(e)));

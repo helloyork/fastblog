@@ -10,12 +10,13 @@ type AuthTableTypes = {
     type: AuthProviderType;
     token: Record<string, any>;
     stamp: number;
+    expireAt: number;
 }
 export const getAuthApi = prepare<{
     getByToken: (token: AuthTableTypes["token"]) => Promise<ServerApiResponse<AuthTableTypes>>;
     getByPath: (path: string, value: any) => Promise<ServerApiResponse<AuthTableTypes>>;
     getByOwner: (ownerid: AuthTableTypes["ownerid"]) => Promise<ServerApiResponse<AuthTableTypes[]>>;
-    addToken: (ownerid: AuthTableTypes["ownerid"], type: AuthTableTypes["type"], token: AuthTableTypes["token"]) => Promise<ServerApiResponse<AuthTableTypes>>;
+    addToken: (ownerid: AuthTableTypes["ownerid"], type: AuthTableTypes["type"], token: AuthTableTypes["token"], expireAt?: number) => Promise<ServerApiResponse<AuthTableTypes>>;
     removeToken: (path: string, token: any) => Promise<DatabaseService.QueryResponse<null>>;
 }>(async (appConfig) => {
     let table = await appConfig.get().runtime.services.database.getTable<AuthTableTypes>("auth", {
@@ -36,6 +37,9 @@ export const getAuthApi = prepare<{
             type: DataTypes.JSONB,
         },
         stamp: {
+            type: DataTypes.INTEGER,
+        },
+        expireAt: {
             type: DataTypes.INTEGER,
         },
     });
@@ -64,12 +68,13 @@ export const getAuthApi = prepare<{
             });
             return res;
         },
-        addToken: async (ownerid: AuthTableTypes["ownerid"], type: AuthTableTypes["type"], token: AuthTableTypes["token"]) => {
+        addToken: async (ownerid: AuthTableTypes["ownerid"], type: AuthTableTypes["type"], token: AuthTableTypes["token"], expireAt?: number) => {
             let res = await table.insert({
                 ownerid,
                 type,
                 token,
                 stamp: Date.now(),
+                expireAt: expireAt || Date.now() + appConfig.get().services.auth.config.expire,
             });
             return res;
         },

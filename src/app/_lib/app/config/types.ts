@@ -31,6 +31,7 @@ type FastBlogConfig<
             type: T["auth"];
             config: AuthService.AuthServiceConfig[T["auth"]];
             cookieStoreName: string;
+            canRegister: boolean;
         }
     };
 }

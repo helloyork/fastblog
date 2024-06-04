@@ -24,6 +24,7 @@ namespace AuthService {
     export type AuthConfig_Credential = {
         username: string;
         password: string;
+        remember?: boolean;
     }
     export type AuthCred = {
         [AuthProviderType.Credential]: AuthConfig_Credential;
@@ -42,8 +43,12 @@ namespace AuthService {
     export type AuthRegisterResult = {
         [AuthProviderType.Credential]: {
             user: Partial<FilteredUserData>;
+            token: string;
         };
-        [AuthProviderType.Base]: {};
+        [AuthProviderType.Base]: {
+            user: Partial<FilteredUserData>;
+            token: string;
+        };
     }
 
     export type AuthResponseTypes = {
@@ -68,7 +73,7 @@ namespace AuthService {
     }
     export interface AuthProvider<T extends AuthProviderType> {
         login(config: AuthCred[T]): Promise<AuthResponseTypes[T]>;
-        register(config: AuthCred[T]): Promise<AuthRegisterResult[T]>;
+        register(config: AuthCred[T]): Promise<AuthResponse<AuthRegisterResult[T]>>;
         auth(token: string): Promise<AuthResponse<Partial<FilteredUserData>>>;
         expire(token: string): Promise<AuthResponse<null>>;
     }

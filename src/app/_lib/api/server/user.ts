@@ -1,8 +1,10 @@
-import { DataTypes } from "sequelize";
-import { ServerApiResponse, prepare } from "./api";
+import "server-only";
 
+import { DataTypes } from "sequelize";
 import zod from "zod";
-import { AuthProviderType, DatabaseService } from "@lib/services/services";
+
+import { ServerApiResponse, prepare } from "./api";
+import { AuthProviderType } from "@lib/services/services";
 import { AuthSecretData } from "@lib/services/auth/types";
 
 type UserProfile = {

@@ -46,6 +46,7 @@ const DefaultConfig: FastBlogConfig<{
                 expire: 7 * 24 * 60 * 60 * 1000,
             },
             cookieStoreName: "auth",
+            canRegister: true,
         }
     },
 };

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { AppConfig } from "@lib/app/config/appConfig";
 import { DatabaseService } from "@lib/services/services";
 
