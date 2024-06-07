@@ -16,3 +16,9 @@ export const auth = (data: Endpoints.Auth["auth"]["request"]) =>
         url: EndpointUrls.AUTH_AUTH,
         method: ClientRequestMethod.POST,
     }, data);
+
+export const logout = () =>
+    requestEndpoint<"logout">({
+        url: EndpointUrls.AUTH_LOGOUT,
+        method: ClientRequestMethod.POST,
+    }, void 0);

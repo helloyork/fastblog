@@ -1,5 +1,4 @@
 import { AuthProviderType, DatabaseProviderType, EnvProviderType } from "@lib/services/services";
-import { readFromEnv } from "@lib/utils/data";
 import type { UserFastBlogConfig } from "@lib/app/config/types";
 
 const config: UserFastBlogConfig<{
@@ -10,9 +9,10 @@ const config: UserFastBlogConfig<{
         database: {
             type: DatabaseProviderType.Postgres,
             config: {
-                username: "postgres",
-                database: "fastblog",
-                host: "localhost",
+                username: process.env.DATABASE_USERNAME,
+                database: process.env.DATABASE_DBNAME,
+                host: process.env.DATABASE_HOST,
+                port: process.env.DATABASE_PORT,
                 password: process.env.DATABASE_PWD
             }
         }

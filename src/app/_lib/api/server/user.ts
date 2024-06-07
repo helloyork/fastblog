@@ -47,6 +47,7 @@ export const getUserApi = prepare<{
         userId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
+            autoIncrement: true,
         },
         username: {
             type: DataTypes.STRING,
@@ -63,7 +64,7 @@ export const getUserApi = prepare<{
             type: DataTypes.ARRAY(DataTypes.JSONB),
             validate: {
                 validator(value) {
-                    return UserDataSchema.safeParse(value).success;
+                    return zod.array(UserAuthSchema).safeParse(value).success;
                 },
             }
         },

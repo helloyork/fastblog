@@ -18,11 +18,13 @@ namespace DatabaseService {
 
     export type QueryStatus = "success" | "error";
     export type QueryResponse<T, Status extends QueryStatus | undefined = undefined> =
-        Status extends undefined ? {
-            status: QueryStatus;
-            data?: T;
-            error?: Error;
-        } : {
+        Status extends undefined ? ({
+            status: "error";
+            error: Error;
+        } | {
+            status: "success";
+            data: T;
+        }) : {
             status: Status;
             data: Status extends "success" ? T : undefined;
             error: Status extends "error" ? Error : undefined;
@@ -34,7 +36,7 @@ namespace DatabaseService {
         database: string;
         host: string;
         password?: string;
-        port?: number;
+        port?: number | string;
         url?: string;
     }
     export type DatabaseConfig = {

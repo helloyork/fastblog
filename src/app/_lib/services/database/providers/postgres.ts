@@ -1,4 +1,4 @@
-import { DataTypes, FindOptions, ModelAttributeColumnOptions, ModelStatic, Sequelize, WhereOptions } from "sequelize";
+import { FindOptions, ModelAttributeColumnOptions, ModelStatic, Sequelize, WhereOptions } from "sequelize";
 import { Model } from "sequelize"
 import { BaseDatabaseProvider, BaseTable } from "../base";
 import { DatabaseService, DatabaseProviderType } from "../types";
@@ -83,6 +83,7 @@ class PostgresTable<T extends {}> extends BaseTable<T> {
             let res = await cb();
             return this.resolve(res);
         } catch (e) {
+            console.log(e)
             return this.reject(e instanceof Error ? e : new Error(
                 typeof e === "string" ? e : String(e)
             ));
@@ -149,7 +150,7 @@ export class PostgresDatabaseProvider extends BaseDatabaseProvider {
                     this.config.password,
                     {
                         host: this.config.host,
-                        port: this.config.port,
+                        port: Number(this.config.port),
                         dialect: "postgres",
                         dialectModule: pg,
                     });

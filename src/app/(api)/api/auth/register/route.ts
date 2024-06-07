@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     const result = await AppConfig.get().runtime.services.auth.register(body);
     if (result.status === "error") {
-        return new Response(result.error.message, { status: 400 });
+        return new Response(result.error.message, { status: (result.error.cause as undefined | number) || 400 });
     }
 
     return new Response(JSON.stringify({

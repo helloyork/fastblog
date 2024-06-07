@@ -3,7 +3,7 @@ import { UserData, getUserApi } from "@lib/api/server/user";
 
 import { BaseAuthProvider } from "../base";
 import { AuthProviderType, AuthService, FilteredUserData } from "../types";
-import { compareHash, generateToken } from "@lib/crypt/crypt";
+import { compareHash, generateToken, toHash } from "@lib/crypt/crypt";
 import { AppConfig } from "@lib/app/config/appConfig";
 import { filter } from "@lib/utils/data";
 import { z } from "zod";
@@ -19,7 +19,7 @@ export class CredentialAuthProvider extends BaseAuthProvider {
         const LoginSchema = z.object({
             username: z.string(),
             password: z.string(),
-            remember: z.boolean(),
+            remember: z.boolean().optional(),
         });
 
         if (!LoginSchema.safeParse(config).success) {
@@ -31,13 +31,13 @@ export class CredentialAuthProvider extends BaseAuthProvider {
         try {
             let user = await userApi.getUserByUsername(config.username);
             if (user.status === "error") throw user.error;
-            if (!user.data) throw new Error("Username or password is incorrect");
+            if (!user.data) throw new Error("Username or password is incorrect_0");
 
             let credMethod = user.data.auth.find((a) => a.type === AuthProviderType.Credential);
-            if (!credMethod) throw new Error("Username or password is incorrect");
+            if (!credMethod) throw new Error("Username or password is incorrect_1");
 
             let compared = await compareHash(config.password, credMethod.data.password || "");
-            if (!compared) throw new Error("Username or password is incorrect");
+            if (!compared) throw new Error("Username or password is incorrect_2");
 
             let token = await generateToken();
             let saved = await authApi.addToken(user.data.userId!, AuthProviderType.Credential, {
@@ -63,7 +63,7 @@ export class CredentialAuthProvider extends BaseAuthProvider {
 
             if (
                 (auth.data.expireAt && Date.now() > auth.data.expireAt) ||
-                (auth.data.stamp + AppConfig.get().services.auth.config.expire > Date.now())
+                (auth.data.stamp.getTime() + AppConfig.get().services.auth.config.expire > Date.now())
             ) {
                 await authApi.removeToken("token.credential", token);
                 throw new Error("Token expired");
@@ -83,7 +83,9 @@ export class CredentialAuthProvider extends BaseAuthProvider {
         });
 
         if (!RegisterSchema.safeParse(config).success) {
-            return this.reject(new Error("Invalid payload"));
+            return this.reject(new Error("Invalid payload", {
+                cause: 400,
+            }));
         }
         let userApi = await getUserApi();
 
@@ -96,17 +98,18 @@ export class CredentialAuthProvider extends BaseAuthProvider {
                 auth: [{
                     type: AuthProviderType.Credential,
                     data: {
-                        password: config.password,
+                        password: await toHash(config.password),
                     },
                 }],
             });
-            if (user.status === "error") throw user.error;
+            if (user.status === "error") return this.reject(user.error, 500);
 
             let token = await this.login({
                 username: config.username,
                 password: config.password,
+                remember: true,
             });
-            if (token.status === "error") throw token.error;
+            if (token.status === "error") return this.reject(token.error, 500);
 
             return this.resolve<{ user: Record<string, any>, token: string; }>({
                 user: filter(AllowedFields, user.data!),
@@ -127,6 +130,12 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             return this.resolve(null);
         } catch (e) {
             return this.reject(e instanceof Error ? e : new Error(String(e)));
+        }
+    }
+    reject<T>(error: Error, cause?: number): AuthService.AuthResponse<T> {
+        return {
+            status: "error",
+            error: cause? new Error(error.message, { cause }) : error,
         }
     }
 }

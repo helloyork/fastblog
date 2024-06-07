@@ -10,6 +10,7 @@ export enum EndpointUrls {
     AUTH_LOGIN = "/api/auth/login",
     AUTH_AUTH = "/api/auth/auth",
     AUTH_REGISTER = "/api/auth/register",
+    AUTH_LOGOUT = "/api/auth/logout",
 }
 
 export namespace Endpoints {
@@ -48,6 +49,12 @@ export namespace Endpoints {
                 user: Partial<FilteredUserData>,
             }>;
         };
+        logout: {
+            url: EndpointUrls.AUTH_LOGOUT;
+            method: ClientRequestMethod.POST;
+            request: any,
+            response: ClientResponse<void>;
+        }
     };
     export type EndpointsType = Auth;
 }

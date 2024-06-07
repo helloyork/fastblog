@@ -9,7 +9,7 @@ type AuthTableTypes = {
     ownerid: number;
     type: AuthProviderType;
     token: Record<string, any>;
-    stamp: number;
+    stamp: Date;
     expireAt: number;
 }
 export const getAuthApi = prepare<{
@@ -19,7 +19,7 @@ export const getAuthApi = prepare<{
     addToken: (ownerid: AuthTableTypes["ownerid"], type: AuthTableTypes["type"], token: AuthTableTypes["token"], expireAt?: number) => Promise<ServerApiResponse<AuthTableTypes>>;
     removeToken: (path: string, token: any) => Promise<DatabaseService.QueryResponse<null>>;
 }>(async (appConfig) => {
-    let table = await appConfig.get().runtime.services.database.getTable<AuthTableTypes>("auth", {
+    let table = await appConfig.get().runtime.services.database.getTable<AuthTableTypes>("auths", {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
@@ -37,7 +37,7 @@ export const getAuthApi = prepare<{
             type: DataTypes.JSONB,
         },
         stamp: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DATE,
         },
         expireAt: {
             type: DataTypes.INTEGER,
@@ -73,7 +73,7 @@ export const getAuthApi = prepare<{
                 ownerid,
                 type,
                 token,
-                stamp: Date.now(),
+                stamp: new Date(),
                 expireAt: expireAt || Date.now() + appConfig.get().services.auth.config.expire,
             });
             return res;

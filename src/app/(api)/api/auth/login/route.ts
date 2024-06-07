@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         remember: !!body.remember,
     });
     if (valid.status === "error") {
-        return new Response(valid.error.message, { status: 400 });
+        return new Response(valid.error.message, { status: 401 });
     }
 
     return new Response("Success", {
