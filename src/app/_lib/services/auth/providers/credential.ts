@@ -42,7 +42,9 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             let token = await generateToken();
             let saved = await authApi.addToken(user.data.userId!, AuthProviderType.Credential, {
                 ["credential"]: token,
-            }, config.remember ? AppConfig.get().services.auth.config.expire : 1 * 24 * 60 * 60 * 1000);
+            }, config.remember ? 
+                Date.now() + AppConfig.get().services.auth.config.expire : 
+                Date.now() + 1 * 24 * 60 * 60 * 1000);
             if (saved.status === "error") throw saved.error;
             return this.resolve(token);
         } catch (e) {
@@ -53,19 +55,23 @@ export class CredentialAuthProvider extends BaseAuthProvider {
         let [authApi, userApi] = await Promise.all([getAuthApi(), getUserApi()]);
 
         try {
-            let auth = await authApi.getByPath("token.credential", token);
+            let auth = await authApi.getByToken({
+                ["credential"]: token,
+            });
+            console.log(auth);
             if (auth.status === "error") throw auth.error;
             if (!auth.data) throw new Error("Invalid token");
+
 
             let user = await userApi.getUserById(auth.data.ownerid);
             if (user.status === "error") throw user.error;
             if (!user.data) throw new Error("Invalid token");
 
             if (
-                (auth.data.expireAt && Date.now() > auth.data.expireAt) ||
-                (auth.data.stamp.getTime() + AppConfig.get().services.auth.config.expire > Date.now())
+                (auth.data.expireAt && Date.now() > auth.data.expireAt.getTime()) ||
+                (auth.data.stamp.getTime() + AppConfig.get().services.auth.config.expire < Date.now())
             ) {
-                await authApi.removeToken("token.credential", token);
+                await authApi.removeTokenById(auth.data.id);
                 throw new Error("Token expired");
             }
 
@@ -126,7 +132,7 @@ export class CredentialAuthProvider extends BaseAuthProvider {
             let authResult = await this.auth(token);
             if (authResult.status === "error") throw authResult.error;
 
-            await authApi.removeToken("token.credential", token);
+            if(authResult.data.userId) await authApi.removeTokenByOwner(authResult.data.userId);
             return this.resolve(null);
         } catch (e) {
             return this.reject(e instanceof Error ? e : new Error(String(e)));

@@ -11,12 +11,14 @@ type FastBlogConfigType = {
     env: EnvProviderType;
     auth: AuthProviderType;
 }
+type FastBlogElement<T extends {}> = {
+    settings: T;
+}
 type FastBlogConfig<
     T extends FastBlogConfigType = FastBlogConfigType,
 > = {
     app: {
         metadata: Metadata;
-        styles: {};
     };
     services: {
         database: {
@@ -43,13 +45,39 @@ type FastBlogRuntime = {
     }
 }
 
+type FastBlogThemeColor = {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+};
+type FastBlogClientConfig = {
+    styles: {};
+    colors: {
+        light: FastBlogThemeColor;
+        dark: FastBlogThemeColor;
+    };
+    elements: {
+        NavBar: FastBlogElement<{
+            items: {
+                title: string;
+                href: string;
+            }[];
+        }>;
+    };
+}
+
 type UserFastBlogConfig<
     T extends Partial<FastBlogConfigType> = FastBlogConfigType,
     _T extends FastBlogConfigType = FastBlogConfigType & T,
 > = DeepPartial<FastBlogConfig<_T>>;
+type UserClientConfig = DeepPartial<FastBlogClientConfig>;
 
 export type {
     FastBlogConfig,
     UserFastBlogConfig,
-    FastBlogRuntime
+    FastBlogRuntime,
+    FastBlogClientConfig,
+    FastBlogThemeColor,
+    UserClientConfig,
 };

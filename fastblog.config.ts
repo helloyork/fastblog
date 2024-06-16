@@ -16,6 +16,15 @@ const config: UserFastBlogConfig<{
                 password: process.env.DATABASE_PWD
             }
         }
-    }
+    },
+    app: {
+        metadata: {
+            title: {
+                default: "FastBlog",
+                template: "FastBlog | %s"
+            },
+            description: "Fast and simple blog"
+        }
+    },
 };
 export default config;

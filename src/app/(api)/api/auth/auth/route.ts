@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
         return new Response("Unauthorized", { status: 401 });
     }
     const authResult = await AppConfig.get().runtime.services.auth.auth(token);
+    console.log(authResult);
     if (!authResult || authResult.status === "error") {
         return new Response("Unauthorized", { status: 401 });
     }

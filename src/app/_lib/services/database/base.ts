@@ -7,25 +7,25 @@ export class BaseTable<T> implements DatabaseService.Table<T> {
         this.provider = provider;
         this.name = name;
     }
-    find(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T[]>>> {
+    find(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T[]>>> {
         throw new Error("Method not implemented.");
     }
-    findOne(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
+    findOne(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         throw new Error("Method not implemented.");
     }
-    has(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<boolean>> {
+    has(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<boolean>> {
         throw new Error("Method not implemented.");
     }
     insert(data: T): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         throw new Error("Method not implemented.");
     }
-    set(query: DatabaseService.Query, data: T): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
+    set(query: DatabaseService.Query<T>, data: T): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         throw new Error("Method not implemented.");
     }
-    update(query: DatabaseService.Query, handler: (data: T) => T | Promise<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
+    update(query: DatabaseService.Query<T>, handler: (data: T) => T | Promise<T>): Promise<DatabaseService.QueryResponse<DatabaseService.AliveData<T>>> {
         throw new Error("Method not implemented.");
     }
-    delete(query: DatabaseService.Query): Promise<DatabaseService.QueryResponse<null>> {
+    delete(query: DatabaseService.Query<T>): Promise<DatabaseService.QueryResponse<null>> {
         throw new Error("Method not implemented.");
     }
 }

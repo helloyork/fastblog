@@ -10,7 +10,7 @@ type AuthTableTypes = {
     type: AuthProviderType;
     token: Record<string, any>;
     stamp: Date;
-    expireAt: number;
+    expireAt: Date;
 }
 export const getAuthApi = prepare<{
     getByToken: (token: AuthTableTypes["token"]) => Promise<ServerApiResponse<AuthTableTypes>>;
@@ -18,6 +18,8 @@ export const getAuthApi = prepare<{
     getByOwner: (ownerid: AuthTableTypes["ownerid"]) => Promise<ServerApiResponse<AuthTableTypes[]>>;
     addToken: (ownerid: AuthTableTypes["ownerid"], type: AuthTableTypes["type"], token: AuthTableTypes["token"], expireAt?: number) => Promise<ServerApiResponse<AuthTableTypes>>;
     removeToken: (path: string, token: any) => Promise<DatabaseService.QueryResponse<null>>;
+    removeTokenById: (id: AuthTableTypes["id"]) => Promise<DatabaseService.QueryResponse<null>>;
+    removeTokenByOwner: (ownerid: AuthTableTypes["ownerid"]) => Promise<DatabaseService.QueryResponse<null>>;
 }>(async (appConfig) => {
     let table = await appConfig.get().runtime.services.database.getTable<AuthTableTypes>("auths", {
         id: {
@@ -40,7 +42,7 @@ export const getAuthApi = prepare<{
             type: DataTypes.DATE,
         },
         expireAt: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DATE,
         },
     });
     return {
@@ -74,7 +76,7 @@ export const getAuthApi = prepare<{
                 type,
                 token,
                 stamp: new Date(),
-                expireAt: expireAt || Date.now() + appConfig.get().services.auth.config.expire,
+                expireAt: new Date(expireAt || Date.now() + appConfig.get().services.auth.config.expire),
             });
             return res;
         },
@@ -82,6 +84,22 @@ export const getAuthApi = prepare<{
             let res = await table.delete({
                 byJSON: {
                     [path]: token,
+                }
+            });
+            return res;
+        },
+        removeTokenById: async (id: AuthTableTypes["id"]) => {
+            let res = await table.delete({
+                byFields: {
+                    id,
+                }
+            });
+            return res;
+        },
+        removeTokenByOwner: async (ownerid: AuthTableTypes["ownerid"]) => {
+            let res = await table.delete({
+                byFields: {
+                    ownerid,
                 }
             });
             return res;

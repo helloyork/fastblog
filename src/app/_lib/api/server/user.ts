@@ -93,6 +93,19 @@ export const getUserApi = prepare<{
                     error: new Error("Invalid data"),
                 } as ServerApiResponse<UserData>;
             }
+            let existingUser = await table.findOne({
+                byFields: {
+                    username: userData.username,
+                }
+            });
+            if (existingUser.status === "success" && existingUser.data) {
+                return {
+                    status: "error",
+                    error: new Error("User already exists", {
+                        cause: 400
+                    }),
+                } as ServerApiResponse<UserData>;
+            }
             return table.insert(userData);
         },
     }

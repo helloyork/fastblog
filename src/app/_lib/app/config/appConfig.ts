@@ -22,7 +22,6 @@ const DefaultConfig: FastBlogConfig<{
             title: "FastBlog",
             description: "Fast and simple blog",
         },
-        styles: {},
     },
     services: {
         database: {
