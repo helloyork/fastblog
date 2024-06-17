@@ -17,12 +17,6 @@ const DefaultConfig: FastBlogConfig<{
     env: EnvProviderType.Local;
     auth: AuthProviderType.Credential;
 }> = {
-    app: {
-        metadata: {
-            title: "FastBlog",
-            description: "Fast and simple blog",
-        },
-    },
     services: {
         database: {
             type: DatabaseProviderType.Postgres,

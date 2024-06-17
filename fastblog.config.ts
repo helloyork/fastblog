@@ -1,4 +1,4 @@
-import { AuthProviderType, DatabaseProviderType, EnvProviderType } from "@lib/services/services";
+import { AuthProviderType, DatabaseProviderType } from "@lib/services/services";
 import type { UserFastBlogConfig } from "@lib/app/config/types";
 
 const config: UserFastBlogConfig<{
@@ -16,15 +16,6 @@ const config: UserFastBlogConfig<{
                 password: process.env.DATABASE_PWD
             }
         }
-    },
-    app: {
-        metadata: {
-            title: {
-                default: "FastBlog",
-                template: "FastBlog | %s"
-            },
-            description: "Fast and simple blog"
-        }
-    },
+    }
 };
 export default config;

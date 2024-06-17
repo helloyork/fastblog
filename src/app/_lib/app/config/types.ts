@@ -17,9 +17,6 @@ type FastBlogElement<T extends {}> = {
 type FastBlogConfig<
     T extends FastBlogConfigType = FastBlogConfigType,
 > = {
-    app: {
-        metadata: Metadata;
-    };
     services: {
         database: {
             type: T["database"];
@@ -53,10 +50,6 @@ type FastBlogThemeColor = {
 };
 type FastBlogClientConfig = {
     styles: {};
-    colors: {
-        light: FastBlogThemeColor;
-        dark: FastBlogThemeColor;
-    };
     elements: {
         NavBar: FastBlogElement<{
             items: {
@@ -64,6 +57,9 @@ type FastBlogClientConfig = {
                 href: string;
             }[];
         }>;
+    };
+    app: {
+        metadata: Metadata;
     };
 }
 
