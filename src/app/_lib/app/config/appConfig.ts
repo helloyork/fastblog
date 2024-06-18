@@ -42,11 +42,15 @@ const DefaultConfig: FastBlogConfig<{
             canRegister: true,
         }
     },
+    metadata: {
+        title: "FastBlog",
+        description: "Fast and simple blog",
+    }
 };
 
 
 export const AppConfig = (function (userConfig: DeepPartial<FastBlogConfig>, defaultConfig: FastBlogConfig) {
-    let _config: FastBlogConfig = assignConfig(userConfig, defaultConfig);
+    let _config: FastBlogConfig = assignConfig<FastBlogConfig>(userConfig, defaultConfig);
     let config: FastBlogConfig & {
         runtime: FastBlogRuntime;
     } = {

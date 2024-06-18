@@ -33,6 +33,7 @@ type FastBlogConfig<
             canRegister: boolean;
         }
     };
+    metadata: Metadata;
 }
 type FastBlogRuntime = {
     services: {
@@ -57,9 +58,6 @@ type FastBlogClientConfig = {
                 href: string;
             }[];
         }>;
-    };
-    app: {
-        metadata: Metadata;
     };
 }
 

@@ -22,14 +22,19 @@ const DefaultClientConfig: FastBlogClientConfig = {
             }
         }
     },
-    app: {
-        metadata: {
-            title: "FastBlog",
-            description: "Fast and simple blog",
-        },
-    },
 }
 
 export const ClientConfig = (function (defaultConfig, userConfig) {
-    return assignConfig(userConfig, defaultConfig);
+    let config = assignConfig<FastBlogClientConfig>(userConfig, defaultConfig);
+    return {
+        get: () => config,
+        set: (key: keyof FastBlogClientConfig, value: any) => config[key] = value,
+        freeze: () => Object.freeze(
+            Object.preventExtensions(
+                Object.seal(
+                    Object.assign({}, config)
+                )
+            )
+        ),
+    }
 })(DefaultClientConfig, UserClientConfig);

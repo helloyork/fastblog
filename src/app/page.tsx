@@ -16,7 +16,7 @@ export default function Home() {
         <>
             <p className={clsx(applyColor(Color.APPLY_TYPE.TEXT, Color.COLOR_TYPE.PRIMARY))}>Hello World!</p>
             <button onClick={toggleTheme}>Toggle Theme</button>
-            <pre>{JSON.stringify(ClientConfig, null, 2)}</pre>
+            <pre>{JSON.stringify(ClientConfig.get(), null, 2)}</pre>
         </>
     );
 }

@@ -17,15 +17,6 @@ const config: UserClientConfig = {
             }
         }
     },
-    app: {
-        metadata: {
-            title: {
-                default: "FastBlog",
-                template: "FastBlog - %s"
-            },
-            description: "Fast and simple blog"
-        }
-    }
 };
 
 export default config;

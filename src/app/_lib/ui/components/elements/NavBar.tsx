@@ -4,20 +4,14 @@ import {
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-    Transition,
 } from '@headlessui/react'
-import {Bars3Icon, BellIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import {ClientConfig} from "@lib/app/config/clientConfig";
 import {usePathname} from 'next/navigation';
 
 
 export default function Example() {
-    const navigation = ClientConfig.elements.NavBar.settings.items;
+    const navigation = ClientConfig.get().elements.NavBar.settings.items;
     const currentPath = usePathname();
     return (
         <Disclosure as="nav" className="bg-gray-800">
